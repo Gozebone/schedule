@@ -37,7 +37,7 @@ def main():
                 'end': {
                     'dateTime': end,  # '2022-09-11T14:00:00+03:00',
                 },
-                'colorId': lesson.type + 1,
+                'colorId': lesson.type + 1,  # colors goes from 1 to 12
             }
             event_funcs.create_event(service, event)
 
