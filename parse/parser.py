@@ -80,7 +80,7 @@ def schedule_by_group(group):
     string = req.text.replace('<tbody><th', '<tbody><tr><th')
     string_2 = string.replace('<tr></tbody>', '</tbody>')
 
-    soup = BeautifulSoup(bytes(string_2, 'utf-8'), 'lxml')
+    soup = BeautifulSoup(bytes(string_2, 'utf-8'), 'html.parser')
 
     # driver = webdriver.Chrome()
 
