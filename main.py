@@ -6,7 +6,7 @@ import parse.parser as parser
 
 def main():
     service = google_service.get_service()
-    group = 'M3136'
+    group = input().capitalize()
 
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
