@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
 
 
 class Lesson:
@@ -24,7 +23,6 @@ class Lesson:
     @staticmethod
     def address_parse(address):
         return address
-        # return address[:address.find(' ')]
 
     @staticmethod
     def lesson_parse(lesson):
@@ -81,18 +79,6 @@ def schedule_by_group(group):
     string_2 = string.replace('<tr></tbody>', '</tbody>')
 
     soup = BeautifulSoup(bytes(string_2, 'utf-8'), 'html.parser')
-
-    # driver = webdriver.Chrome()
-
-    # driver.get(group_url)
-
-    # html = driver.page_source
-
-    # soup = BeautifulSoup(html)
-
-    # f = open("response.txt", "w")
-    # f.write(req.content.__str__())
-    # f.close()
 
     schedule_html = []
     for day in range(1, 7):
