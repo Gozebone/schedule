@@ -33,13 +33,6 @@ def main():
                 'colorId': lesson.type + 1,  # colors goes from 1 to 12
             }
             event_funcs.create_event(service, event)
-
-    start = '2022-09-11T11:00:00+03:00'
-    end = '2022-09-11T18:00:00+03:00'
-
-    events = event_funcs.get_events_by_time(service, start, end)
-    for event in events:
-        event_funcs.delete_event(service, event['id'])
-
+            
 if __name__ == '__main__':
     main()
