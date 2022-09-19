@@ -28,7 +28,7 @@ def compare_list_events(events, cur_event):
 
 def main():
     service = google_service.get_service()
-    group = 'M3136'
+    group = 'M3139'
 
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
