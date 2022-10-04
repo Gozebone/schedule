@@ -2,13 +2,14 @@ from datetime import date, timedelta
 import google_calendar.event_funcs as event_funcs
 import google_calendar.google_service as google_service
 import parse.parser as parser
+import re
 
 
 def main():
     service = google_service.get_service()
 
     # getting google calendar
-    if not event_funcs.is_schedule_calendar_exist(service):
+    if not event_funcs.is_schedule_calendar_exists(service):
         print(f"You dont have a {event_funcs.CALENDAR_NAME} calendar, create it? (Y/N): ")
         while True:
             answer = input()
@@ -27,39 +28,29 @@ def main():
     schedule_calendar = event_funcs.get_schedule_calendar(service)
     
     # schedule parse
-    group = input("Enter group number in M3107 format: ").capitalize()
+    while True:
+        group = input("Enter group number in M3136 format: ").capitalize()
+        if (re.match(r'\b[A-Z]\d[1-5]\d{2}\b', group)):
+            break
+        else:
+            print("Wrong input")
+    
     week = parser.get_schedule(group)
     
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
-    
-    #TODO update event if its already exist
+
     for day in week.days:
         cur_date = str(start_of_week + timedelta(days=day.day_index))
+        existing_events = event_funcs.get_events_by_date(service, schedule_calendar, cur_date)
         for lesson in day.lessons:
-            start = cur_date + 'T' + lesson.time_start + ':00+03:00'
-
-            end = cur_date + 'T' + lesson.time_end + ':00+03:00'
-
-            event = {
-                'summary': lesson.lesson,
-                'location': lesson.address,
-                'description': lesson.room,
-                'start': {
-                    'dateTime': start,
-                },
-                'end': {
-                    'dateTime': end,
-                },
-                'colorId': lesson.type + 1,  # colors goes from 1 to 12
-                'reminders': {
-                    'useDefault': False,
-                    'overrides': [
-                        {'method': 'popup', 'minutes': 10},
-                    ],
-                },
-            }
-            event_funcs.create_event(service, schedule_calendar, event)
+            if (re.match(r'\d{2}:\d{2}', lesson.time_start) == None):
+                continue
+            event = event_funcs.build_event(lesson, cur_date)
+            if (not event_funcs.event_exists(event, existing_events)):
+                event_funcs.create_event(service, schedule_calendar, event)
+                pass
             
+    
 if __name__ == '__main__':
     main()
