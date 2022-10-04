@@ -13,19 +13,19 @@ class Lesson:
             tr.select(".lesson > dl > dd")[0].get_text())
 
     @staticmethod
-    def time_parse(time):
+    def time_parse(time: str) -> tuple[str, str]:
         return time[:5], time[6:]
 
     @staticmethod
-    def room_parse(room):
+    def room_parse(room: str) -> str:
         return room[:4]
 
     @staticmethod
-    def address_parse(address):
+    def address_parse(address: str) -> str:
         return address
 
     @staticmethod
-    def lesson_parse(lesson):
+    def lesson_parse(lesson: str) -> tuple[str, int]:
         open_br_index = lesson.find('(')
         close_br_index = lesson.find(')')
         lesson_type = lesson[open_br_index + 1:close_br_index]
@@ -58,11 +58,11 @@ class Week:
                 self.days.append(Day(current_day, index))
 
 
-def group_number_generator(group):
+def group_number_generator(group: str) -> str:
     return f'https://itmo.ru/ru/schedule/0/{group}/1/raspisanie_zanyatiy_{group}.htm'
 
 
-def schedule_by_group(group):
+def schedule_by_group(group: str) -> list[str]:
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
@@ -73,7 +73,7 @@ def schedule_by_group(group):
 
     group_url = group_number_generator(group)
 
-    req = requests.get(group_url)
+    req = requests.get(group_url, headers)
 
     string = req.text.replace('<tbody><th', '<tbody><tr><th')
     string_2 = string.replace('<tr></tbody>', '</tbody>')
@@ -87,5 +87,5 @@ def schedule_by_group(group):
     return schedule_html
 
 
-def get_schedule(group):
+def get_schedule(group: str) -> Week:
     return Week(schedule_by_group(group))
