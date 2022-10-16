@@ -29,7 +29,6 @@ def is_schedule_calendar_exists(service):
     return False
         
         
-
 def get_schedule_calendar(service):
     page_token = None
     schedule_calendar = None
