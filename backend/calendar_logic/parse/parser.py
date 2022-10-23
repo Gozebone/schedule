@@ -58,11 +58,11 @@ class Week:
                 self.days.append(Day(current_day, index))
 
 
-def group_number_generator(group: str) -> str:
-    return f'https://itmo.ru/ru/schedule/0/{group}/1/raspisanie_zanyatiy_{group}.htm'
+def group_number_generator(group: str, week_mod_2: int) -> str:
+    return f'https://itmo.ru/ru/schedule/0/{group}/{week_mod_2 + 1}/raspisanie_zanyatiy_{group}.htm'
 
 
-def schedule_by_group(group: str) -> list[str]:
+def schedule_by_group(group: str, week_mod_2: int) -> list[str]:
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
@@ -71,7 +71,7 @@ def schedule_by_group(group: str) -> list[str]:
         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
     }
 
-    group_url = group_number_generator(group)
+    group_url = group_number_generator(group, week_mod_2)
 
     req = requests.get(group_url, headers)
 
@@ -87,5 +87,5 @@ def schedule_by_group(group: str) -> list[str]:
     return schedule_html
 
 
-def get_schedule(group: str) -> Week:
-    return Week(schedule_by_group(group))
+def get_schedule(group: str, week_mod_2: int) -> Week:
+    return Week(schedule_by_group(group, week_mod_2))

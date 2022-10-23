@@ -28,7 +28,7 @@ def add_events(group: str):
                 continue         
     
     schedule_calendar = event_funcs.get_schedule_calendar(service)
-    print(schedule_calendar)
+    
     # schedule parse
     # while True:
     #     group = input("Enter group number in M3136 format: ").capitalize()
@@ -36,10 +36,11 @@ def add_events(group: str):
     #         break
     #     else:
     #         print("Wrong input")
-    week = parser.get_schedule(group)
-    print(week)
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
+    
+    week = parser.get_schedule(group, today.isocalendar().week % 2)
+    
     if sys.argv.count("-n") > 0:
         start_of_week += timedelta(weeks=1)
         

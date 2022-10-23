@@ -113,13 +113,15 @@ def build_event(lesson: Lesson, cur_date: str) -> dict:
     return event
 
 
-def get_color_by_type(id: int) -> str:
+def get_color_by_type(id: int) -> int:
     if (id == 0):
         return 1 # Lavender
     elif (id == 1):
         return 5 # Banana
     elif (id == 2):
         return 3 # Grape
+    else:
+        return 8
 
 
 def to_iso_time_format(date: str, time: str) -> str:
