@@ -12,6 +12,8 @@ def index(request):
 
 
 def create_events(request):
+    name = request.GET.get('name', None)
+    password = request.GET.get('password', None)
     group = request.GET.get('group', None)
 
     add_events(group)
