@@ -5,13 +5,20 @@
     <link rel="stylesheet" href="button.css">
   </head>
   <body>
+    <input id="nickname" type="text" 
+    required
+       minlength="3" size="10" placeholder="Name" >
+    <input id="password" type="text" 
+    required
+        minlength="3" size="10" placeholder="Password">
+
     <input id="group" type="text" 
     required
-       minlength="5" maxlength="5" size="10">
-    <button id="addSchedule" type="submit" > "Add schedule" </button>
+       minlength="5" maxlength="5" size="10" placeholder="Group">
+    <input id="addSchedule" type="submit" value="Add schedule"/>
 
     <script src="jquery-3.6.0.min.js"></script>
-    <script src="jquery.min.js"></script>
+    <script src="jquery.min.js"></script> 
     <script src="popup.js"></script>
 
   </body>
