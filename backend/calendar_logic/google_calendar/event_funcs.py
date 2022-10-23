@@ -1,6 +1,6 @@
 import datetime
 import math
-from parse.parser import Lesson
+from calendar_logic.parse.parser import Lesson
 
 CALENDAR_NAME = "ITMO Schedule"
 

@@ -1,12 +1,13 @@
 from datetime import date, timedelta
 import sys
-import google_calendar.event_funcs as event_funcs
-import google_calendar.google_service as google_service
-import parse.parser as parser
 import re
 
+import calendar_logic.google_calendar.event_funcs as event_funcs
+import calendar_logic.google_calendar.google_service as google_service
+import calendar_logic.parse.parser as parser
 
-def main():
+
+def add_events(group: str):
     service = google_service.get_service()
     
     # getting google calendar
@@ -27,16 +28,16 @@ def main():
                 continue         
     
     schedule_calendar = event_funcs.get_schedule_calendar(service)
-    
+    print(schedule_calendar)
     # schedule parse
-    while True:
-        group = input("Enter group number in M3136 format: ").capitalize()
-        if (re.match(r'\b[A-Z]\d[1-5]\d{2}\b', group)):
-            break
-        else:
-            print("Wrong input")
+    # while True:
+    #     group = input("Enter group number in M3136 format: ").capitalize()
+    #     if (re.match(r'\b[A-Z]\d[1-5]\d{2}\b', group)):
+    #         break
+    #     else:
+    #         print("Wrong input")
     week = parser.get_schedule(group)
-    
+    print(week)
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
     if sys.argv.count("-n") > 0:
@@ -52,7 +53,3 @@ def main():
             if (not event_funcs.event_exists(event, existing_events)):
                 event_funcs.create_event(service, schedule_calendar, event)
                 pass
-            
-    
-if __name__ == '__main__':
-    main()

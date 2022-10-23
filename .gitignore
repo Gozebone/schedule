@@ -1,5 +1,15 @@
 *.pyc
 response.txt
-google_calendar/token.json
-google_calendar/credentials.json
+backend/calendar_logic/google_calendar/token.json
+backend/calendar_logic/google_calendar/credentials.json
 venv/
+
+backend/db.sqlite3
+
+chromeExtension.crx
+chromeExtension.pem
+
+.env
+
+.vscode/
+.idea/

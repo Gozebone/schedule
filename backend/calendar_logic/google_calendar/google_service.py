@@ -12,8 +12,9 @@ from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar']
-TOKEN_PATH = 'google_calendar/token.json'
-CRED_PATH = 'google_calendar/credentials.json'
+SELF_PATH = 'calendar_logic/google_calendar/'
+TOKEN_PATH = SELF_PATH + 'token.json'
+CRED_PATH = SELF_PATH + 'credentials.json'
 
 def get_service():
     creds = None
