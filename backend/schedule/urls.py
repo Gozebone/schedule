@@ -1,4 +1,4 @@
-"""schedul URL Configuration
+"""schedule URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -17,6 +17,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('google_calendar/', include('apps.functionCaller.urls')),
+    path('google_calendar/', include('apps.function_caller.urls')),
     path('admin/', admin.site.urls),
 ]
