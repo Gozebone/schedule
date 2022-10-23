@@ -21,8 +21,7 @@ def get_service():
     # created automatically when the authorization flow completes for the first
     # time.
     if os.path.exists(TOKEN_PATH):
-        with open(TOKEN_PATH) as fp:
-            creds = Credentials.from_authorized_user_file(TOKEN_PATH, SCOPES)
+        creds = Credentials.from_authorized_user_file(TOKEN_PATH, SCOPES)
 
     if not creds or not creds.valid:
         flow = InstalledAppFlow.from_client_secrets_file(
