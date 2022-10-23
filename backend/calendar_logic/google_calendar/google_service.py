@@ -22,20 +22,12 @@ def get_service():
     # created automatically when the authorization flow completes for the first
     # time.
     if os.path.exists(TOKEN_PATH):
-        with open(TOKEN_PATH) as fp:
-            json_object = json.load(fp)
-            mask = '%Y-%m-%dT%H:%M:%S.%fZ'
-            if datetime.datetime.strptime(json_object['expiry'], mask) > datetime.datetime.today():  
-                creds = Credentials.from_authorized_user_file(
-                    TOKEN_PATH, SCOPES)
-    # If there are no (valid) credentials available, let the user log in.
+        creds = Credentials.from_authorized_user_file(TOKEN_PATH, SCOPES)
+
     if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                CRED_PATH, SCOPES)
-            creds = flow.run_local_server(port=0)
+        flow = InstalledAppFlow.from_client_secrets_file(
+            CRED_PATH, SCOPES)
+        creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open(TOKEN_PATH, 'w') as token:
             token.write(creds.to_json())

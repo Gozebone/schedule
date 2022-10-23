@@ -5,10 +5,12 @@
 ## Installation
 - ##### Create venv
 
-   ```python3 -m venv .\venv```
+   ```python3 -m venv ./venv```
 - ##### Activate venv
  
-   ```.\venv\Scripts\activate```
+   Win: ```.\venv\Scripts\activate```
+   
+   Linux: ```source ./venv/bin/activate```
 - ##### Install requirements
  
    ```pip install -r requirements.txt```
