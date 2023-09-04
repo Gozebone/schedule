@@ -53,8 +53,6 @@ def create_event(service, calendar, event):
     # )
 
 
-# Example call:
-# event_funcs.delete_event(service, event['id'])
 def delete_event(service, calendar, id):
     service.events().delete(calendarId=calendar["id"], eventId=id).execute()
 
@@ -120,9 +118,7 @@ def build_event(lesson: Lesson, cur_date: str) -> dict:
         "colorId": get_color_by_type(lesson.type),
         "reminders": {
             "useDefault": False,
-            "overrides": [
-                {"method": "popup", "minutes": 10},
-            ],
+            # "overrides": [ {"method": "popup", "minutes": 10} ]
         },
     }
 

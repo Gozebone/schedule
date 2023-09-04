@@ -64,6 +64,8 @@ class Flags:
         self.push = False
         self.save = False
         self.help = False
+        self.remove = False
+        self.next_week = False
 
 
 def parse_flags(args: list) -> Flags:
@@ -83,8 +85,15 @@ def parse_flags(args: list) -> Flags:
 
     if args.count("-p"):
         flags.push = True
+
     if args.count("-s"):
         flags.save = True
+
+    if args.count("-r"):
+        flags.remove = True
+
+    if args.count("-n"):
+        flags.next_week = True
 
     return flags
 
@@ -98,7 +107,7 @@ def main():
     flags = parse_flags(sys.argv)
 
     if flags.help:
-        print("=== GOOGLE Calendar SCHEDULE Fill Tool ===")
+        print("=== Google Calendar Schedule Tool ===")
         print()
         print("FLAGS:")
         print("  -h -- show this message")
@@ -108,6 +117,7 @@ def main():
         print("Actions: (by default -c is used)")
         print(f"  -s -- save schedule to '{SCHEDULE_FILE_PATH}'")
         print("  -p -- push schedule to Google Calendar")
+        print("  -r -- remove schedule-related events from Google Calendar")
 
         return
 
@@ -126,29 +136,40 @@ def main():
     if flags.save:
         save_schedule(week)
 
-    if flags.push:
+    if flags.push or flags.remove:
         service = google_service.get_service()
         schedule_calendar = get_calendar(service)
 
         today = date.today()
         start_of_week = today - timedelta(days=today.weekday())
-        if sys.argv.count("-n") > 0:
+        if flags.next_week:
             start_of_week += timedelta(weeks=1)
 
-        events_created = 0
-        for day in week.days:
-            cur_date = str(start_of_week + timedelta(days=day.day_index))
-            existing_events = event_funcs.get_events_by_date(
-                service, schedule_calendar, cur_date
-            )
-            for lesson in day.lessons:
-                if re.match(r"\d{2}:\d{2}", lesson.start_time) is not None:
-                    event = event_funcs.build_event(lesson, cur_date)
-                    if not event_funcs.event_exists(event, existing_events):
-                        event_funcs.create_event(service, schedule_calendar, event)
-                        events_created += 1
+        if flags.remove:
+            for day in week.days:
+                cur_date = str(start_of_week + timedelta(days=day.day_index))
+                existing_events = event_funcs.get_events_by_date(
+                    service, schedule_calendar, cur_date
+                )
+                for event in existing_events:
+                    event_funcs.delete_event(service, schedule_calendar, event["id"])
+            print(f"=== Events removed ===")
 
-        print(f"=== {events_created} event(s) created ===")
+        if flags.push:
+            events_created = 0
+            for day in week.days:
+                cur_date = str(start_of_week + timedelta(days=day.day_index))
+                existing_events = event_funcs.get_events_by_date(
+                    service, schedule_calendar, cur_date
+                )
+                for lesson in day.lessons:
+                    if re.match(r"\d{2}:\d{2}", lesson.start_time) is not None:
+                        event = event_funcs.build_event(lesson, cur_date)
+                        if not event_funcs.event_exists(event, existing_events):
+                            event_funcs.create_event(service, schedule_calendar, event)
+                            events_created += 1
+
+            print(f"=== {events_created} event(s) created ===")
 
 
 if __name__ == "__main__":
