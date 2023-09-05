@@ -3,13 +3,14 @@ from bs4 import BeautifulSoup
 
 
 class Lesson:
-    def __init__(self, lesson, start_time, end_time, room, address, type):
+    def __init__(self, lesson, start_time, end_time, room, address, type, weeks=2):
         self.lesson = lesson
         self.start_time = start_time
         self.end_time = end_time
         self.room = room
         self.address = address
         self.type = type
+        self.weeks = weeks  # 0 - even, 1 - odd, 2 - all time
 
     @classmethod
     def from_html(cls, tr):
@@ -25,8 +26,9 @@ class Lesson:
             "start_time": self.start_time,
             "end_time": self.end_time,
             "room": self.room,
-            "address": str(self.address),
+            "address": self.address,
             "type": self.type,
+            "weeks": self.weeks,
         }
 
     @classmethod
@@ -38,6 +40,7 @@ class Lesson:
             obj["room"],
             obj["address"],
             obj["type"],
+            obj["weeks"] if "weeks" in obj else 2,
         )
 
     @staticmethod

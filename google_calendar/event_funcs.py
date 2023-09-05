@@ -2,21 +2,19 @@ import datetime
 import math
 from parse.parser import Lesson
 
-CALENDAR_NAME = "ITMO Schedule"
 
-
-def create_calendar(service):
-    calendar = {"summary": CALENDAR_NAME, "timeZone": "Europe/Moscow"}
+def create_calendar(service, calendar_name):
+    calendar = {"summary": calendar_name, "timeZone": "Europe/Moscow"}
 
     service.calendars().insert(body=calendar).execute()
 
 
-def is_schedule_calendar_exists(service):
+def is_schedule_calendar_exists(service, calendar_name):
     page_token = None
     while True:
         calendar_list = service.calendarList().list(pageToken=page_token).execute()
         for calendar_list_entry in calendar_list["items"]:
-            if calendar_list_entry["summary"] == CALENDAR_NAME:
+            if calendar_list_entry["summary"] == calendar_name:
                 return True
 
         page_token = calendar_list.get("nextPageToken")
@@ -26,13 +24,13 @@ def is_schedule_calendar_exists(service):
     return False
 
 
-def get_schedule_calendar(service):
+def get_schedule_calendar(service, calendar_name):
     page_token = None
     schedule_calendar = None
     while True:
         calendar_list = service.calendarList().list(pageToken=page_token).execute()
         for calendar_list_entry in calendar_list["items"]:
-            if calendar_list_entry["summary"] == CALENDAR_NAME:
+            if calendar_list_entry["summary"] == calendar_name:
                 schedule_calendar = calendar_list_entry
                 break
 
@@ -40,7 +38,7 @@ def get_schedule_calendar(service):
         if not page_token:
             break
     if schedule_calendar == None:
-        print(f"No {CALENDAR_NAME} calendar found\nCheck if you have renamed it")
+        print(f"No {calendar_name} calendar found\nCheck if you have renamed it")
 
     return schedule_calendar
 
@@ -125,13 +123,15 @@ def build_event(lesson: Lesson, cur_date: str) -> dict:
     return event
 
 
-def get_color_by_type(id: int) -> str:
+def get_color_by_type(id: int) -> int:
     if id == 0:
         return 1  # Lavender
     elif id == 1:
         return 5  # Banana
     elif id == 2:
         return 3  # Grape
+    else:
+        return 8
 
 
 def to_iso_time_format(date: str, time: str) -> str:

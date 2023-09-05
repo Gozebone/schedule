@@ -20,7 +20,13 @@ def fetch_schedule(group) -> parser.Week:
     return parser.get_schedule(group)
 
 
-SCHEDULE_FILE_PATH = "schedule.json"
+# TODO: make flag to pass calendar name and json path
+
+# SCHEDULE_FILE_PATH = "schedule.json"
+# CALENDAR_NAME = "ITMO Schedule"
+
+SCHEDULE_FILE_PATH = "schedule-phy.json"
+CALENDAR_NAME = "Polytech Schedule"
 
 
 def load_schedule() -> parser.Week:
@@ -34,15 +40,13 @@ def save_schedule(week: parser.Week):
 
 
 def get_calendar(service):
-    if not event_funcs.is_schedule_calendar_exists(service):
-        print(
-            f"You dont have a {event_funcs.CALENDAR_NAME} calendar, create it? (Y/N): "
-        )
+    if not event_funcs.is_schedule_calendar_exists(service, CALENDAR_NAME):
+        print(f"You dont have a {CALENDAR_NAME} calendar, create it? (Y/N): ")
         while True:
             answer = input()
             if answer == "Y":
                 print("Creating calendar")
-                event_funcs.create_calendar(service)
+                event_funcs.create_calendar(service, CALENDAR_NAME)
                 break
             elif answer == "N":
                 print("Terminating...")
@@ -51,7 +55,7 @@ def get_calendar(service):
                 print("Unexpected answer, try again (Y/N): ")
                 continue
 
-    return event_funcs.get_schedule_calendar(service)
+    return event_funcs.get_schedule_calendar(service, CALENDAR_NAME)
 
 
 class Flags:
@@ -59,7 +63,7 @@ class Flags:
     CACHE = "cache"
 
     def __init__(self):
-        self.scheule_source = None
+        self.scheule_source = self.CACHE
         self.group = None
         self.push = False
         self.save = False
@@ -157,13 +161,17 @@ def main():
 
         if flags.push:
             events_created = 0
+            cur_week = (today.isocalendar().week + flags.next_week) % 2 + 1
             for day in week.days:
                 cur_date = str(start_of_week + timedelta(days=day.day_index))
                 existing_events = event_funcs.get_events_by_date(
                     service, schedule_calendar, cur_date
                 )
                 for lesson in day.lessons:
-                    if re.match(r"\d{2}:\d{2}", lesson.start_time) is not None:
+                    if (
+                        re.match(r"\d?\d:\d{2}", lesson.start_time) is not None
+                        and (lesson.weeks + 1) & cur_week
+                    ):
                         event = event_funcs.build_event(lesson, cur_date)
                         if not event_funcs.event_exists(event, existing_events):
                             event_funcs.create_event(service, schedule_calendar, event)
