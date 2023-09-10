@@ -94,9 +94,15 @@ def get_events_by_date(service, calendar, cur_date: str) -> list[dict]:
 
 def event_exists(new_event, existing_events) -> bool:
     for event in existing_events:
-        if new_event["start"]["dateTime"] == event["start"]["dateTime"]:
+        if (
+            new_event["start"]["dateTime"] == event["start"]["dateTime"]
+            and new_event["end"]["dateTime"] == event["end"]["dateTime"]
+        ):
             if new_event["summary"] == event["summary"]:
-                if new_event["description"] == event["description"]:
+                if (
+                    "description" not in event
+                    or new_event["description"] == event["description"]
+                ):
                     return True
 
     return False
@@ -113,25 +119,22 @@ def build_event(lesson: Lesson, cur_date: str) -> dict:
         "end": {
             "dateTime": to_iso_time_format(cur_date, lesson.end_time),
         },
-        "colorId": get_color_by_type(lesson.type),
-        "reminders": {
-            "useDefault": False,
-            # "overrides": [ {"method": "popup", "minutes": 10} ]
-        },
+        # "colorId": get_color_by_type(lesson.type),
+        "reminders": {"useDefault": False},
     }
 
     return event
 
 
-def get_color_by_type(id: int) -> int:
-    if id == 0:
-        return 1  # Lavender
-    elif id == 1:
-        return 5  # Banana
-    elif id == 2:
-        return 3  # Grape
-    else:
-        return 8
+# def get_color_by_type(id: int) -> int:
+#     if id == 0:
+#         return 1  # Lavender
+#     elif id == 1:
+#         return 5  # Banana
+#     elif id == 2:
+#         return 3  # Grape
+#     else:
+#         return 8
 
 
 def to_iso_time_format(date: str, time: str) -> str:

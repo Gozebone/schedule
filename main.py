@@ -20,33 +20,24 @@ def fetch_schedule(group) -> parser.Week:
     return parser.get_schedule(group)
 
 
-# TODO: make flag to pass calendar name and json path
-
-# SCHEDULE_FILE_PATH = "schedule.json"
-# CALENDAR_NAME = "ITMO Schedule"
-
-SCHEDULE_FILE_PATH = "schedule-phy.json"
-CALENDAR_NAME = "Polytech Schedule"
-
-
-def load_schedule() -> parser.Week:
-    with open(SCHEDULE_FILE_PATH, "r", encoding="utf8") as file:
+def load_schedule(schedule_file_path) -> parser.Week:
+    with open(schedule_file_path, "r", encoding="utf8") as file:
         return parser.Week.deserialize(json.loads(file.read()))
 
 
-def save_schedule(week: parser.Week):
-    with open(SCHEDULE_FILE_PATH, "w", encoding="utf8") as file:
+def save_schedule(schedule_file_path, week: parser.Week):
+    with open(schedule_file_path, "w", encoding="utf8") as file:
         json.dump(week.serialize(), file, ensure_ascii=False)
 
 
-def get_calendar(service):
-    if not event_funcs.is_schedule_calendar_exists(service, CALENDAR_NAME):
-        print(f"You dont have a {CALENDAR_NAME} calendar, create it? (Y/N): ")
+def get_calendar(calendar_name, service):
+    if not event_funcs.is_schedule_calendar_exists(service, calendar_name):
+        print(f"You dont have a {calendar_name} calendar, create it? (Y/N): ")
         while True:
             answer = input()
             if answer == "Y":
                 print("Creating calendar")
-                event_funcs.create_calendar(service, CALENDAR_NAME)
+                event_funcs.create_calendar(service, calendar_name)
                 break
             elif answer == "N":
                 print("Terminating...")
@@ -55,7 +46,7 @@ def get_calendar(service):
                 print("Unexpected answer, try again (Y/N): ")
                 continue
 
-    return event_funcs.get_schedule_calendar(service, CALENDAR_NAME)
+    return event_funcs.get_schedule_calendar(service, calendar_name)
 
 
 class Flags:
@@ -70,6 +61,8 @@ class Flags:
         self.help = False
         self.remove = False
         self.next_week = False
+        self.schedule_file_path = ""
+        self.calendar_name = ""
 
 
 def parse_flags(args: list) -> Flags:
@@ -99,6 +92,15 @@ def parse_flags(args: list) -> Flags:
     if args.count("-n"):
         flags.next_week = True
 
+    if args.count("-path"):
+        i = args.index("-path")
+        if len(args) > i + 1:
+            flags.schedule_file_path = args[i + 1]
+    if args.count("-calendar"):
+        i = args.index("-calendar")
+        if len(args) > i + 1:
+            flags.calendar_name = args[i + 1]
+
     return flags
 
 
@@ -117,9 +119,9 @@ def main():
         print("  -h -- show this message")
         print("Schedule sources:")
         print("  -f [GROUP NUMBER] -- fetch schedule from itmo.ru")
-        print(f"  -c -- use schedule from local '{SCHEDULE_FILE_PATH}' file")
+        print(f"  -c -- use schedule from local '{flags.schedule_file_path}' file")
         print("Actions: (by default -c is used)")
-        print(f"  -s -- save schedule to '{SCHEDULE_FILE_PATH}'")
+        print(f"  -s -- save schedule to '{flags.schedule_file_path}'")
         print("  -p -- push schedule to Google Calendar")
         print("  -r -- remove schedule-related events from Google Calendar")
 
@@ -128,21 +130,21 @@ def main():
     if flags.scheule_source == flags.FETCH:
         week = fetch_schedule(flags.group)
     else:
-        if os.path.exists(SCHEDULE_FILE_PATH):
-            week = load_schedule()
+        if os.path.exists(flags.schedule_file_path):
+            week = load_schedule(flags.schedule_file_path)
         else:
             print(
-                f"'{SCHEDULE_FILE_PATH}' doesn't exist. Create it or run with -f flag to fetch schedule."
+                f"'{flags.schedule_file_path}' doesn't exist. Create it or run with -f flag to fetch schedule."
             )
             print("Use -h for help")
             return
 
     if flags.save:
-        save_schedule(week)
+        save_schedule(flags.schedule_file_path, week)
 
     if flags.push or flags.remove:
         service = google_service.get_service()
-        schedule_calendar = get_calendar(service)
+        schedule_calendar = get_calendar(flags.calendar_name, service)
 
         today = date.today()
         start_of_week = today - timedelta(days=today.weekday())
@@ -169,7 +171,7 @@ def main():
                 )
                 for lesson in day.lessons:
                     if (
-                        re.match(r"\d?\d:\d{2}", lesson.start_time) is not None
+                        re.match(r"\d{2}:\d{2}", lesson.start_time) is not None
                         and (lesson.weeks + 1) & cur_week
                     ):
                         event = event_funcs.build_event(lesson, cur_date)
