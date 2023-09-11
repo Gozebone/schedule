@@ -179,7 +179,7 @@ def main():
                             event_funcs.create_event(service, schedule_calendar, event)
                             events_created += 1
 
-            print(f"=== {events_created} event(s) created ===")
+            print(f"=== {flags.calendar_name}: {events_created} event(s) created ===")
 
 
 if __name__ == "__main__":
